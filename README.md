@@ -6,3 +6,4 @@ when `position: static;`, left and right are both changing the element's width, 
 # TODOs
 
 [ ] handlers position should follow the content's position. 
+[ ] handlers style 'bar' or 'dot'.
