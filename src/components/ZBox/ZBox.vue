@@ -29,13 +29,13 @@ watchEffect(() => {
       ? "relative"
       : "static";
 
-    // 重置位置
+    // reset top/left when resizable or draggable changed
     zbox.style.top = "";
     zbox.style.left = "";
   }
 });
 
-// 视图优化：滚动时隐藏handlers
+// remove scroll's listener when resizable is false
 watch(
   () => props.resizable,
   () => {
@@ -68,20 +68,16 @@ const onMouseDown = (e: MouseEvent) => {
   currentDirection.value = null;
 };
 
-// 鼠标松开事件处理
 function onMouseUp() {
   currentMode.value = null;
   currentDirection.value = null;
 
-  // 移除临时类
   handlers.forEach((handler) => handler.ref!.classList.remove("active"));
 
-  // 移除全局事件监听
   document.removeEventListener("mousemove", onMouseMove);
   document.removeEventListener("mouseup", onMouseUp);
 }
 
-// 鼠标移动事件处理
 function onMouseMove(e: MouseEvent) {
   const zbox = container.value!;
   const deltaLeft = e.clientX - positionX;
@@ -121,7 +117,7 @@ function onMouseMove(e: MouseEvent) {
 const handlerWrapper = ref<HTMLDivElement | null>(null);
 const isShowHandlers = ref(true);
 
-// 监听scroll，隐藏handlers，直到滚动停止
+// hide handlers when scrolling
 let scrollTimer: number | null = null;
 function onScroll() {
   if (!props.resizable) return;
@@ -137,7 +133,7 @@ function onScroll() {
   }, 200);
 }
 
-// handler鼠标按下事件处理
+// generate handler's mousedown event
 const genHandlerMouseDown = (handler: Handler) => (e: MouseEvent) => {
   const zbox = container.value!;
   const handlerElement = handler.ref!;
@@ -223,7 +219,6 @@ onUnmounted(() => {
         background-color: rgba(0, 0, 0, 0.1);
       }
 
-      /* 边框样式 - 上 */
       .handler-top {
         top: 0;
         left: 0;
@@ -232,7 +227,6 @@ onUnmounted(() => {
         cursor: ns-resize;
       }
 
-      /* 边框样式 - 右 */
       .handler-right {
         top: 0;
         right: 0;
@@ -241,7 +235,6 @@ onUnmounted(() => {
         cursor: ew-resize;
       }
 
-      /* 边框样式 - 下 */
       .handler-bottom {
         bottom: 0;
         left: 0;
@@ -250,7 +243,6 @@ onUnmounted(() => {
         cursor: ns-resize;
       }
 
-      /* 边框样式 - 左 */
       .handler-left {
         top: 0;
         left: 0;
@@ -259,7 +251,6 @@ onUnmounted(() => {
         cursor: ew-resize;
       }
 
-      /* 边框悬停效果 */
       .handler-top:hover,
       .handler-right:hover,
       .handler-bottom:hover,
