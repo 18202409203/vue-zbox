@@ -1,19 +1,27 @@
 <script setup lang="ts">
-import ZBox from './components/ZBox/ZBox.vue'
+import { ref } from "vue";
+import ZBox from "./components/ZBox/ZBox.vue";
+
+const resizable = ref(false);
+const draggable = ref(false);
 </script>
 
 <template>
   <div style="position: absolute; left: 200px">
     <h1>ZBox</h1>
+    <input type="checkbox" v-model="resizable" />
+    <label>resizable</label>
+    <input type="checkbox" v-model="draggable" />
+    <label>draggable</label>
     <p>Hello!</p>
-    <ZBox class="box" :draggable="true" :resizable="true">
+    <ZBox class="box" :draggable="draggable" :resizable="resizable">
       <div class="content">
         <h1>Inner Text</h1>
         <p>Hello World!</p>
         <div class="item"></div>
       </div>
     </ZBox>
-    <p>World</p>
+    <p>World!</p>
   </div>
 </template>
 
@@ -22,7 +30,6 @@ import ZBox from './components/ZBox/ZBox.vue'
   border: 1px solid #ccc;
   overflow-x: hidden;
   overflow-y: auto;
-  position: absolute;
   width: 200px;
   height: 200px;
   background-color: aqua;

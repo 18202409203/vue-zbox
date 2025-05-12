@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { Handler } from "./handler";
 import type { Direction, Noop, ZMode } from "./types";
 
@@ -19,6 +19,22 @@ const container = ref<HTMLDivElement | null>(null);
 const currentDirection = ref<Direction | Noop>(null);
 const currentMode = ref<ZMode | Noop>(null);
 
+// position, top, left
+watchEffect(() => {
+  const zbox = container.value!;
+  if (zbox) {
+    zbox.style.position = props.draggable
+      ? "absolute"
+      : props.resizable
+      ? "relative"
+      : "static";
+
+    // 重置位置
+    zbox.style.top = "";
+    zbox.style.left = "";
+  }
+});
+
 onMounted(() => {
   const zbox = container.value!;
   let startX: number,
@@ -29,40 +45,35 @@ onMounted(() => {
     positionY: number; // for dragging
 
   // zbox添加鼠标按下事件
-  if (props.draggable) {
-    zbox.style.position = "absolute";
-    zbox.addEventListener("mousedown", (e: MouseEvent) => {
-      positionX = e.clientX;
-      positionY = e.clientY;
-      e.preventDefault();
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+  zbox.addEventListener("mousedown", (e: MouseEvent) => {
+    positionX = e.clientX;
+    positionY = e.clientY;
+    e.preventDefault();
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
 
-      // 优先resize
-      if (currentMode.value === "resizing") return;
+    if (currentMode.value === "resizing") return;
 
-      currentMode.value = "dragging";
-      currentDirection.value = null;
-    });
-  }
+    currentMode.value = props.draggable ? "dragging" : null;
+    currentDirection.value = null;
+  });
 
   // 为每个边框添加鼠标按下事件
-  if (props.resizable) {
-    handlers.forEach((handler) => {
-      const handlerElement = handler.ref!;
+  handlers.forEach((handler) => {
+    const handlerElement = handler.ref!;
 
-      handlerElement.addEventListener("mousedown", (e: MouseEvent) => {
-        currentMode.value = "resizing";
-        currentDirection.value = handler.dir;
+    handlerElement.addEventListener("mousedown", (e: MouseEvent) => {
+      if (!props.resizable) return;
+      currentMode.value = "resizing";
+      currentDirection.value = handler.dir;
 
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = zbox.offsetWidth;
-        startHeight = zbox.offsetHeight;
-        handlerElement.classList.add("active");
-      });
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = zbox.offsetWidth;
+      startHeight = zbox.offsetHeight;
+      handlerElement.classList.add("active");
     });
-  }
+  });
 
   // 鼠标移动事件处理
   function onMouseMove(e: MouseEvent) {
@@ -136,55 +147,6 @@ onMounted(() => {
 .zbox_container {
   --handler-size: 5px;
 
-  .handler {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-
-  /* 边框样式 - 上 */
-  .handler-top {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: var(--handler-size);
-    cursor: ns-resize;
-  }
-
-  /* 边框样式 - 右 */
-  .handler-right {
-    top: 0;
-    right: 0;
-    width: var(--handler-size);
-    height: 100%;
-    cursor: ew-resize;
-  }
-
-  /* 边框样式 - 下 */
-  .handler-bottom {
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: var(--handler-size);
-    cursor: ns-resize;
-  }
-
-  /* 边框样式 - 左 */
-  .handler-left {
-    top: 0;
-    left: 0;
-    width: var(--handler-size);
-    height: 100%;
-    cursor: ew-resize;
-  }
-
-  /* 边框悬停效果 */
-  .handler-top:hover,
-  .handler-right:hover,
-  .handler-bottom:hover,
-  .handler-left:hover {
-    background-color: rgba(17, 133, 242, 0.5);
-  }
-
   &.draggable {
     position: absolute;
     cursor: move;
@@ -199,6 +161,55 @@ onMounted(() => {
 
   &.resizable {
     position: relative;
+
+    .handler {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* 边框样式 - 上 */
+    .handler-top {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--handler-size);
+      cursor: ns-resize;
+    }
+
+    /* 边框样式 - 右 */
+    .handler-right {
+      top: 0;
+      right: 0;
+      width: var(--handler-size);
+      height: 100%;
+      cursor: ew-resize;
+    }
+
+    /* 边框样式 - 下 */
+    .handler-bottom {
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: var(--handler-size);
+      cursor: ns-resize;
+    }
+
+    /* 边框样式 - 左 */
+    .handler-left {
+      top: 0;
+      left: 0;
+      width: var(--handler-size);
+      height: 100%;
+      cursor: ew-resize;
+    }
+
+    /* 边框悬停效果 */
+    .handler-top:hover,
+    .handler-right:hover,
+    .handler-bottom:hover,
+    .handler-left:hover {
+      background-color: rgba(17, 133, 242, 0.5);
+    }
   }
 }
 </style>
