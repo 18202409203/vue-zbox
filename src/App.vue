@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import ZBox from "./components/ZBox/ZBox.vue";
+import HelloWorld from "./components/HelloWorld.vue";
 
 const resizable = ref(false);
 const draggable = ref(false);
@@ -20,6 +21,7 @@ const draggable = ref(false);
         <p>Hello World!</p>
         <div class="item"></div>
       </div>
+      <HelloWorld msg="Hello ZBox"/>
     </ZBox>
     <p>World!</p>
   </div>

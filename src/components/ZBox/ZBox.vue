@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch, watchEffect } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from "vue";
 import { Handler } from "./handler";
 import type { Direction, Noop, ZMode } from "./types";
 
@@ -114,24 +114,31 @@ function onMouseMove(e: MouseEvent) {
   }
 }
 
-const handlerWrapper = ref<HTMLDivElement | null>(null);
-const isShowHandlers = ref(true);
-
 // hide handlers when scrolling
+const handlerWrapper = ref<HTMLDivElement | null>(null);
+const isShowHandlers = computed(() => {
+  return props.resizable && !isScrolling.value;
+});
+
+const isScrolling = ref(false);
 let scrollTimer: number | null = null;
 function onScroll() {
-  if (!props.resizable) return;
-  const zbox = container.value!;
-  isShowHandlers.value = false;
-
+  isScrolling.value = true;
   if (scrollTimer) clearTimeout(scrollTimer);
   scrollTimer = setTimeout(() => {
-    handlerWrapper.value!.style.left = zbox.scrollLeft + "px";
-    handlerWrapper.value!.style.top = zbox.scrollTop + "px";
-    isShowHandlers.value = true;
+    isScrolling.value = false;
     scrollTimer = null;
   }, 200);
 }
+
+// make sure that handlerWrapper's position is based on zbox's scrollLeft/scrollTop
+watch(isShowHandlers, () => {
+  const zbox = container.value!;
+  if (isShowHandlers.value && handlerWrapper.value) {
+    handlerWrapper.value!.style.left = zbox.scrollLeft + "px";
+    handlerWrapper.value!.style.top = zbox.scrollTop + "px";
+  }
+});
 
 // generate handler's mousedown event
 const genHandlerMouseDown = (handler: Handler) => (e: MouseEvent) => {
