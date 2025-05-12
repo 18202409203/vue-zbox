@@ -181,15 +181,15 @@ onUnmounted(() => {
 <template>
   <div
     ref="container"
-    class="zbox_container"
+    class="zbox__container"
     :class="{ draggable: draggable, resizable: resizable }"
   >
-    <div ref="handlerWrapper" class="handler_wrapper" v-show="isShowHandlers">
+    <div ref="handlerWrapper" class="handler__wrapper" v-show="isShowHandlers">
       <div
         v-for="handler of handlers"
         :key="handler.dir"
         class="handler"
-        :class="`${Handler.prefix}-${handler.dir}`"
+        :class="`${Handler.prefix}-${handler.dir} ${Handler.prefix}__${handler.style}`"
       ></div>
     </div>
     <slot></slot>
@@ -197,7 +197,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.zbox_container {
+.zbox__container {
   &.draggable {
     position: absolute;
     cursor: move;
@@ -213,8 +213,9 @@ onUnmounted(() => {
   &.resizable {
     position: relative;
 
-    .handler_wrapper {
-      --handler-size: 5px;
+    .handler__wrapper {
+      --handler-bar-size: 4px;
+      --handler-dot-size: 8px;
       position: absolute;
       width: 100%;
       height: 100%;
@@ -226,36 +227,70 @@ onUnmounted(() => {
         background-color: rgba(0, 0, 0, 0.1);
       }
 
-      .handler-top {
+      .handler__bar.handler-top {
         top: 0;
         left: 0;
         width: 100%;
-        height: var(--handler-size);
+        height: var(--handler-bar-size);
         cursor: ns-resize;
       }
 
-      .handler-right {
+      .handler__bar.handler-right {
         top: 0;
         right: 0;
-        width: var(--handler-size);
+        width: var(--handler-bar-size);
         height: 100%;
         cursor: ew-resize;
       }
 
-      .handler-bottom {
+      .handler__bar.handler-bottom {
         bottom: 0;
         left: 0;
         width: 100%;
-        height: var(--handler-size);
+        height: var(--handler-bar-size);
         cursor: ns-resize;
       }
 
-      .handler-left {
+      .handler__bar.handler-left {
         top: 0;
         left: 0;
-        width: var(--handler-size);
+        width: var(--handler-bar-size);
         height: 100%;
         cursor: ew-resize;
+      }
+
+      .handler__dot {
+        width: var(--handler-dot-size);
+        height: var(--handler-dot-size);
+        background-color: #892;
+      }
+
+      .handler__dot.handler-top {
+        top: 0;
+        left: 50%;
+        cursor: ns-resize;
+        transform: translate(-50%, 0);
+      }
+
+      .handler__dot.handler-right {
+        top: 50%;
+        right: 0;
+        cursor: ew-resize;
+        transform: translate(0, -50%);
+      }
+
+      .handler__dot.handler-bottom {
+        bottom: 0;
+        left: 50%;
+        cursor: ns-resize;
+        transform: translate(-50%, 0);
+      }
+
+      .handler__dot.handler-left {
+        top: 50%;
+        left: 0;
+        cursor: ew-resize;
+        transform: translate(0, -50%);
       }
 
       .handler-top:hover,
