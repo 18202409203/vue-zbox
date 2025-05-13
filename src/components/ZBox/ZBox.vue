@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from "vue";
 import { Handler, HandlerGroup } from "./handler";
-import type { Direction, Noop, ZBoxProps, ZMode } from "./types";
+import type { Direction, Noop, ZBoxEvents, ZBoxProps, ZMode } from "./types";
 import { useScroll } from "./useScroll";
 
 const props = withDefaults(defineProps<ZBoxProps>(), {
@@ -10,6 +10,8 @@ const props = withDefaults(defineProps<ZBoxProps>(), {
   handlersBit: 0b1111,
   handlerStyle: "dot",
 });
+
+const $emit = defineEmits<ZBoxEvents>();
 
 const handlerGroup = new HandlerGroup(props.handlersBit);
 const handlers = handlerGroup.handlers;
@@ -69,9 +71,17 @@ const onMouseDown = (e: MouseEvent) => {
 
   currentMode.value = props.draggable ? "dragging" : null;
   currentDirection.value = null;
+
+  if (props.draggable) $emit("drag", e);
 };
 
-function onMouseUp() {
+function onMouseUp(e: MouseEvent) {
+  if (currentMode.value === "resizing") {
+    $emit("resizeEnd", e);
+  } else if (currentMode.value === "dragging") {
+    $emit("dragEnd", e);
+  }
+
   currentMode.value = null;
   currentDirection.value = null;
 
@@ -130,6 +140,8 @@ const genHandlerMouseDown = (handler: Handler) => (e: MouseEvent) => {
   startWidth = zbox.offsetWidth;
   startHeight = zbox.offsetHeight;
   handlerElement.classList.add("active");
+
+  $emit("resize", e);
 };
 
 onMounted(() => {

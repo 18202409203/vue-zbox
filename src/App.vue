@@ -5,6 +5,24 @@ import HelloWorld from "./components/HelloWorld.vue";
 
 const resizable = ref(false);
 const draggable = ref(false);
+
+function onDrag(e: MouseEvent) {
+  console.log("drag");
+  console.log(e);
+}
+
+function onResize(e: MouseEvent) {
+  console.log("resize");
+  console.log(e);
+}
+
+function onDragEnd(e: MouseEvent) {
+  console.log("drag end");
+}
+
+function onResizeEnd(e: MouseEvent) {
+  console.log("resize end");
+}
 </script>
 
 <template>
@@ -15,13 +33,22 @@ const draggable = ref(false);
     <input type="checkbox" v-model="draggable" />
     <label>draggable</label>
     <p>Hello!</p>
-    <ZBox class="box" :draggable="draggable" :resizable="resizable" :handlers-bit="0b1010">
+    <ZBox
+      class="box"
+      :draggable="draggable"
+      :resizable="resizable"
+      :handlers-bit="0b1010"
+      @drag="onDrag"
+      @resize="onResize"
+      @dragEnd="onDragEnd"
+      @resizeEnd="onResizeEnd"
+    >
       <div class="content">
         <h1>Inner Text</h1>
         <p>Hello World!</p>
         <div class="item"></div>
       </div>
-      <HelloWorld msg="Hello ZBox"/>
+      <HelloWorld msg="Hello ZBox" />
     </ZBox>
     <p>World!</p>
   </div>
