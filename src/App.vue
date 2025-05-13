@@ -15,7 +15,7 @@ const draggable = ref(false);
     <input type="checkbox" v-model="draggable" />
     <label>draggable</label>
     <p>Hello!</p>
-    <ZBox class="box" :draggable="draggable" :resizable="resizable">
+    <ZBox class="box" :draggable="draggable" :resizable="resizable" :handlers-bit="0b1010">
       <div class="content">
         <h1>Inner Text</h1>
         <p>Hello World!</p>

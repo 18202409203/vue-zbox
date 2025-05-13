@@ -1,23 +1,20 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from "vue";
-import { Handler } from "./handler";
-import type { Direction, Noop, ZMode } from "./types";
+import { Handler, HandlerGroup } from "./handler";
+import type { Direction, Noop, ZBoxProps, ZMode } from "./types";
+import { useScroll } from "./useScroll";
 
-const handlers: Handler[] = [
-  new Handler("top"),
-  new Handler("right"),
-  new Handler("bottom"),
-  new Handler("left"),
-];
+const props = withDefaults(defineProps<ZBoxProps>(), {
+  draggable: false,
+  resizable: false,
+  handlersBit: 0b1111,
+  handlerStyle: "dot",
+});
 
-const props = defineProps<{
-  resizable?: boolean;
-  draggable?: boolean;
-}>();
+const handlerGroup = new HandlerGroup(props.handlersBit);
+const handlers = handlerGroup.handlers;
 
 const container = ref<HTMLDivElement | null>(null);
-const currentDirection = ref<Direction | Noop>(null);
-const currentMode = ref<ZMode | Noop>(null);
 
 // position, top, left
 watchEffect(() => {
@@ -35,18 +32,24 @@ watchEffect(() => {
   }
 });
 
-// remove scroll's listener when resizable is false
-watch(
-  () => props.resizable,
-  () => {
-    const zbox = container.value!;
-    if (props.resizable) {
-      zbox.addEventListener("scroll", onScroll);
-    } else {
-      zbox.removeEventListener("scroll", onScroll);
-    }
+const { isScrolling } = useScroll(container);
+// hide handlers when scrolling
+const isShowHandlers = computed(() => {
+  return props.resizable && !isScrolling.value;
+});
+
+const handlerWrapper = ref<HTMLDivElement | null>(null);
+// make sure that handlerWrapper's position is based on zbox's scrollLeft/scrollTop
+watch(isShowHandlers, () => {
+  const zbox = container.value!;
+  if (isShowHandlers.value && handlerWrapper.value) {
+    handlerWrapper.value!.style.left = zbox.scrollLeft + "px";
+    handlerWrapper.value!.style.top = zbox.scrollTop + "px";
   }
-);
+});
+
+const currentDirection = ref<Direction | Noop>(null);
+const currentMode = ref<ZMode | Noop>(null);
 
 let startX: number,
   startY: number, // for resizing
@@ -114,32 +117,6 @@ function onMouseMove(e: MouseEvent) {
   }
 }
 
-// hide handlers when scrolling
-const handlerWrapper = ref<HTMLDivElement | null>(null);
-const isShowHandlers = computed(() => {
-  return props.resizable && !isScrolling.value;
-});
-
-const isScrolling = ref(false);
-let scrollTimer: number | null = null;
-function onScroll() {
-  isScrolling.value = true;
-  if (scrollTimer) clearTimeout(scrollTimer);
-  scrollTimer = setTimeout(() => {
-    isScrolling.value = false;
-    scrollTimer = null;
-  }, 200);
-}
-
-// make sure that handlerWrapper's position is based on zbox's scrollLeft/scrollTop
-watch(isShowHandlers, () => {
-  const zbox = container.value!;
-  if (isShowHandlers.value && handlerWrapper.value) {
-    handlerWrapper.value!.style.left = zbox.scrollLeft + "px";
-    handlerWrapper.value!.style.top = zbox.scrollTop + "px";
-  }
-});
-
 // generate handler's mousedown event
 const genHandlerMouseDown = (handler: Handler) => (e: MouseEvent) => {
   const zbox = container.value!;
@@ -157,24 +134,16 @@ const genHandlerMouseDown = (handler: Handler) => (e: MouseEvent) => {
 
 onMounted(() => {
   const zbox = container.value!;
-
   zbox.addEventListener("mousedown", onMouseDown);
-  zbox.addEventListener("scroll", onScroll);
 
-  handlers.forEach((handler) => {
-    handler.init(genHandlerMouseDown(handler));
-  });
+  handlerGroup.init(genHandlerMouseDown);
 });
 
 onUnmounted(() => {
   const zbox = container.value!;
-
   zbox.removeEventListener("mousedown", onMouseDown);
-  zbox.removeEventListener("scroll", onScroll);
 
-  handlers.forEach((handler) => {
-    handler.uninit();
-  });
+  handlerGroup.uninit();
 });
 </script>
 
@@ -189,7 +158,7 @@ onUnmounted(() => {
         v-for="handler of handlers"
         :key="handler.dir"
         class="handler"
-        :class="`${Handler.prefix}-${handler.dir} ${Handler.prefix}__${handler.style}`"
+        :class="`${Handler.prefix}-${handler.dir} ${Handler.prefix}__${props.handlerStyle}`"
       ></div>
     </div>
     <slot></slot>

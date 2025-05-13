@@ -1,13 +1,11 @@
-import type { Direction, HandlerStyle } from "./types";
+import type { Direction } from "./types";
 
 export class Handler {
   dir: Direction = "top";
-  style: HandlerStyle = "dot";
   _onMouseDown: (e: MouseEvent) => void = () => {};
   static prefix: string = "handler";
-  constructor(dir: Direction, style: HandlerStyle = "bar") {
+  constructor(dir: Direction) {
     this.dir = dir;
-    this.style = style;
   }
 
   get ref() {
@@ -23,5 +21,42 @@ export class Handler {
 
   uninit() {
     this.ref?.removeEventListener("mousedown", this._onMouseDown);
+  }
+}
+
+export const HANDLERS: Direction[] = [
+  "left",
+  "bottom",
+  "right",
+  "top",
+  "bottomLeft",
+  "bottomRight",
+  "topRight",
+  "topLeft",
+];
+
+export class HandlerGroup {
+  handlers: Handler[] = [];
+  flag: number = 0b1111;
+  constructor(flag = 0b1111) {
+    this.flag = flag;
+    this.handlers = this._parseHandlers();
+  }
+  init(onMouseDownFactory: (h: Handler) => (e: MouseEvent) => void) {
+    this.handlers.forEach((handler) =>
+      handler.init(onMouseDownFactory(handler))
+    );
+  }
+  uninit() {
+    this.handlers.forEach((handler) => handler.uninit());
+  }
+  _parseHandlers() {
+    const n = this.flag || 0b1111;
+    return HANDLERS.reduce<Handler[]>((acc, dir, i) => {
+      if ((n >> i) & 1) {
+        acc.push(new Handler(dir));
+      }
+      return acc;
+    }, []);
   }
 }
