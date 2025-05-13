@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref, type Ref } from "vue";
+import { onBeforeUnmount, onMounted, ref, type Ref } from "vue";
 
 export function useScroll(container: Ref<HTMLElement | null>) {
   const isScrolling = ref(false);
@@ -17,7 +17,7 @@ export function useScroll(container: Ref<HTMLElement | null>) {
     container.value!.addEventListener("scroll", onScroll);
   });
 
-  onUnmounted(() => {
+  onBeforeUnmount(() => {
     container.value!.removeEventListener("scroll", onScroll);
   });
   return {

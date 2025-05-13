@@ -1,5 +1,12 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from "vue";
+import {
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  ref,
+  watch,
+  watchEffect,
+} from "vue";
 import { Handler, HandlerGroup } from "./handler";
 import type { Direction, Noop, ZBoxEvents, ZBoxProps, ZMode } from "./types";
 import { useScroll } from "./useScroll";
@@ -151,7 +158,7 @@ onMounted(() => {
   handlerGroup.init(genHandlerMouseDown);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   const zbox = container.value!;
   zbox.removeEventListener("mousedown", onMouseDown);
 
@@ -206,6 +213,7 @@ onUnmounted(() => {
       .handler {
         position: absolute;
         background-color: rgba(0, 0, 0, 0.1);
+        z-index: 1;
       }
 
       .handler__bar.handler-top {
