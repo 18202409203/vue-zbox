@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "publish": "npm run build && npm publish --access=public"
   },
   "main": "dist/zbox.umd.js",
   "module": "dist/zbox.es.js",
