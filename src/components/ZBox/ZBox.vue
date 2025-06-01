@@ -70,7 +70,7 @@ let startX: number,
 const onMouseDown = (e: MouseEvent) => {
   positionX = e.clientX;
   positionY = e.clientY;
-  e.preventDefault();
+  // e.preventDefault();
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("mouseup", onMouseUp);
 
@@ -205,6 +205,7 @@ onBeforeUnmount(() => {
       --handler-bar-size: 4px;
       --handler-dot-size: 8px;
       position: absolute;
+      pointer-events: none;
       width: 100%;
       height: 100%;
       top: 0;
@@ -212,6 +213,7 @@ onBeforeUnmount(() => {
 
       .handler {
         position: absolute;
+        pointer-events: auto;
         background-color: rgba(0, 0, 0, 0.1);
         z-index: 1;
       }

@@ -48,6 +48,7 @@ function onResizeEnd(e: MouseEvent) {
       <div class="content">
         <h1>Inner Text</h1>
         <p>Hello World!</p>
+        <input type="text" />
         <div class="item"></div>
       </div>
       <HelloWorld msg="Hello ZBox" />
