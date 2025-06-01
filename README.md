@@ -19,7 +19,7 @@ export type ZBoxProps = {
 };
 ```
 
-And some events you mabey need.
+And some events you maybe need.
 
 ```js
 import "zbox/dist/zbox.css"
