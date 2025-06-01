@@ -1,3 +1,5 @@
+import { Component } from "vue";
+
 export type Noop = null | undefined;
 export type Direction =
   | "top"
@@ -28,3 +30,7 @@ export type ZBoxEvents = {
   (e: "resizeEnd", p: MouseEvent): void;
   (e: "dragEnd", p: MouseEvent): void;
 };
+
+declare const ZBox: Component<ZBoxProps>;
+
+export default ZBox;

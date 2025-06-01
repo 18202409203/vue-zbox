@@ -18,10 +18,12 @@ function onResize(e: MouseEvent) {
 
 function onDragEnd(e: MouseEvent) {
   console.log("drag end");
+  console.log(e);
 }
 
 function onResizeEnd(e: MouseEvent) {
   console.log("resize end");
+  console.log(e);
 }
 </script>
 
