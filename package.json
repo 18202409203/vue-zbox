@@ -10,6 +10,13 @@
   },
   "main": "dist/zbox.umd.js",
   "module": "dist/zbox.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/zbox.es.js",
+      "require": "./dist/zbox.umd.js"
+    },
+    "./style.css": "./dist/zbox.css"
+  },
   "types": "src/components/ZBox/types.d.ts",
   "files": [
     "dist",
