@@ -113,10 +113,13 @@ function onMouseMove(e: MouseEvent) {
     const dy = e.clientY - startY;
     switch (currentDirection.value) {
       case "top":
+        // prevent height from being negative
+        if (startHeight - dy <= 0) break;
         zbox.style.height = startHeight - dy + "px";
         if (props.draggable) zbox.style.top = zbox.offsetTop + deltaTop + "px";
         break;
       case "left":
+        if (startWidth - dx <= 0) break;
         zbox.style.width = startWidth - dx + "px";
         if (props.draggable)
           zbox.style.left = zbox.offsetLeft + deltaLeft + "px";
