@@ -9,7 +9,6 @@
   draggable
   resizable
   :handlers-bit="0b1010"
-  handler-type="dot"
   handler-style="background-color: red"
   @drag="onDrag"
   @resize="onResize"
@@ -39,9 +38,11 @@ You can compose those directions freely.
 
 ```ts
 export type ZBoxProps = {
-  // NOTE: use binary to represent handlers, 1 means enable, 0 means disable
+  /**
+   * NOTE: use binary to represent handlers, 1 means enable, 0 means disable
+   * Default is 0b1111.
+   */
   handlersBit?: number;
-  handlerType?: HandlerType; // dot, bar
 
   /**
    * This is bind to handler's style attribute.
@@ -70,3 +71,7 @@ export type ZBoxEvents = {
   (e: "dragEnd", p: MouseEvent): void;
 };
 ```
+
+# Further
+
+Our position strategy is based on `top/left`.

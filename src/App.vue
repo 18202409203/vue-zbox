@@ -3,8 +3,8 @@ import { ref } from "vue";
 import ZBox from "./components/ZBox/ZBox.vue";
 import HelloWorld from "./components/HelloWorld.vue";
 
-const resizable = ref(false);
-const draggable = ref(false);
+const resizable = ref(true);
+const draggable = ref(true);
 
 function onDrag(e: MouseEvent) {
   console.log("drag");
@@ -39,9 +39,7 @@ function onResizeEnd(e: MouseEvent) {
       class="box"
       :draggable="draggable"
       :resizable="resizable"
-      :handlers-bit="0b1111"
-      :handler-size="20"
-      handler-type="bar"
+      :handlers-bit="0b11111111"
       handler-style="background-color: red"
       :min-height="96"
       :min-width="96"

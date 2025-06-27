@@ -8,30 +8,31 @@ import {
   watchEffect,
 } from "vue";
 import { Handler, HandlerGroup } from "./handler";
-import type { Direction, Noop, ZBoxEvents, ZBoxProps, ZMode } from "./types";
+import type {
+  BasicDirection,
+  Direction,
+  Noop,
+  ZBoxEvents,
+  ZBoxProps,
+  ZMode,
+} from "./types";
 import { useScroll } from "./useScroll";
+import { decomposeDirection } from "./direction";
 
 const props = withDefaults(defineProps<ZBoxProps>(), {
   draggable: false,
   resizable: false,
   handlersBit: 0b1111,
-  handlerType: "dot",
+  handlerSize: 8,
 });
 
 // tackle some defaults
 const computedProps = computed(() => ({
-  handlerSize: props.handlerSize || (props.handlerType == "dot" ? 8 : 4),
-  minWidth:
-    props.minWidth || props.handlerSize || (props.handlerType == "dot" ? 8 : 4),
-  minHeight:
-    props.minHeight ||
-    props.handlerSize ||
-    (props.handlerType == "dot" ? 8 : 4),
+  minWidth: props.minWidth || props.handlerSize,
+  minHeight: props.minHeight || props.handlerSize,
 }));
 
-const computedHandlerSize = computed(
-  () => computedProps.value.handlerSize + "px"
-);
+const computedHandlerSize = computed(() => props.handlerSize + "px");
 
 const $emit = defineEmits<ZBoxEvents>();
 
@@ -126,29 +127,36 @@ function onMouseMove(e: MouseEvent) {
   } else if (currentMode.value === "resizing") {
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-    switch (currentDirection.value) {
-      case "top":
-        if (startHeight - dy <= computedProps.value.minHeight) break;
-        zbox.style.height = startHeight - dy + "px";
-        if (props.draggable) zbox.style.top = zbox.offsetTop + deltaTop + "px";
-        break;
-      case "left":
-        if (startWidth - dx <= computedProps.value.minWidth) break;
-        zbox.style.width = startWidth - dx + "px";
-        if (props.draggable)
-          zbox.style.left = zbox.offsetLeft + deltaLeft + "px";
-        break;
-      case "right":
-        if (startWidth + dx <= computedProps.value.minWidth) break;
-        zbox.style.width = startWidth + dx + "px";
-        break;
-      case "bottom":
-        if (startHeight + dy <= computedProps.value.minHeight) break;
-        zbox.style.height = startHeight + dy + "px";
-        break;
-      default:
-        console.log("error");
-        break;
+
+    const dirs: BasicDirection[] = decomposeDirection(currentDirection.value);
+    dirs.forEach(doMove);
+
+    function doMove(dir: BasicDirection) {
+      switch (dir) {
+        case "top":
+          if (startHeight - dy <= computedProps.value.minHeight) break;
+          zbox.style.height = startHeight - dy + "px";
+          if (props.draggable)
+            zbox.style.top = zbox.offsetTop + deltaTop + "px";
+          break;
+        case "left":
+          if (startWidth - dx <= computedProps.value.minWidth) break;
+          zbox.style.width = startWidth - dx + "px";
+          if (props.draggable)
+            zbox.style.left = zbox.offsetLeft + deltaLeft + "px";
+          break;
+        case "right":
+          if (startWidth + dx <= computedProps.value.minWidth) break;
+          zbox.style.width = startWidth + dx + "px";
+          break;
+        case "bottom":
+          if (startHeight + dy <= computedProps.value.minHeight) break;
+          zbox.style.height = startHeight + dy + "px";
+          break;
+        default:
+          console.log("Not support direction: " + dir);
+          break;
+      }
     }
   }
 }
@@ -196,7 +204,7 @@ onBeforeUnmount(() => {
         v-for="handler of handlers"
         :key="handler.dir"
         class="handler"
-        :class="`${Handler.prefix}-${handler.dir} ${Handler.prefix}__${props.handlerType}`"
+        :class="`${Handler.prefix}-${handler.dir} ${Handler.prefix}__dot`"
         :style="handlerStyle"
       ></div>
     </div>
@@ -236,38 +244,6 @@ onBeforeUnmount(() => {
         z-index: 1;
       }
 
-      .handler__bar.handler-top {
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: v-bind("computedHandlerSize");
-        cursor: ns-resize;
-      }
-
-      .handler__bar.handler-right {
-        top: 0;
-        right: 0;
-        width: v-bind("computedHandlerSize");
-        height: 100%;
-        cursor: ew-resize;
-      }
-
-      .handler__bar.handler-bottom {
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: v-bind("computedHandlerSize");
-        cursor: ns-resize;
-      }
-
-      .handler__bar.handler-left {
-        top: 0;
-        left: 0;
-        width: v-bind("computedHandlerSize");
-        height: 100%;
-        cursor: ew-resize;
-      }
-
       .handler__dot {
         width: v-bind("computedHandlerSize");
         height: v-bind("computedHandlerSize");
@@ -300,6 +276,30 @@ onBeforeUnmount(() => {
         left: 0;
         cursor: ew-resize;
         transform: translate(0, -50%);
+      }
+
+      .handler__dot.handler-top-left {
+        top: 0;
+        left: 0;
+        cursor: nwse-resize;
+      }
+
+      .handler__dot.handler-top-right {
+        top: 0;
+        right: 0;
+        cursor: nesw-resize;
+      }
+
+      .handler__dot.handler-bottom-right {
+        bottom: 0;
+        right: 0;
+        cursor: nwse-resize;
+      }
+
+      .handler__dot.handler-bottom-left {
+        bottom: 0;
+        left: 0;
+        cursor: nesw-resize;
       }
 
       .handler-top:hover,

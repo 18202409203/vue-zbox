@@ -29,10 +29,10 @@ export const HANDLERS: Direction[] = [
   "bottom",
   "right",
   "top",
-  "bottomLeft",
-  "bottomRight",
-  "topRight",
-  "topLeft",
+  "bottom-left",
+  "bottom-right",
+  "top-right",
+  "top-left",
 ];
 
 export class HandlerGroup {

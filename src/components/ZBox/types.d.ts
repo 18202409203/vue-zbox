@@ -1,32 +1,24 @@
 import { Component } from "vue";
 
 export type Noop = null | undefined;
+
+export type BasicDirection = "top" | "bottom" | "left" | "right";
+
 export type Direction =
-  | "top"
-  | "bottom"
-  | "left"
-  | "right"
-  | "topLeft"
-  | "topRight"
-  | "bottomLeft"
-  | "bottomRight";
-export type HandlerType = "dot" | "bar";
+  | BasicDirection
+  | "top-left"
+  | "bottom-left"
+  | "bottom-right"
+  | "top-right";
+
 export type ZMode = "resizing" | "dragging";
 
 export type ZBoxProps = {
-  // NOTE: use binary to represent handlers, 1 means enable, 0 means disable
-  // | HEX  | BIN          | DEC | DIRECTION   |
-  // | ---- | ------------ | --- | ----------- |
-  // | 0x08 | 0b_0000_1000 | 8   | top         |
-  // | 0x04 | 0b_0000_0100 | 4   | right       |
-  // | 0x02 | 0b_0000_0010 | 2   | bottom      |
-  // | 0x01 | 0b_0000_0001 | 1   | left        |
-  // | 0x80 | 0b_1000_0000 | 128 | topLeft     |
-  // | 0x40 | 0b_0100_0000 | 64  | topRight    |
-  // | 0x20 | 0b_0010_0000 | 32  | bottomRight |
-  // | 0x10 | 0b_0001_0000 | 16  | bottomLeft  |
+  /**
+   * NOTE: use binary to represent handlers, 1 means enable, 0 means disable
+   * Default is 0b1111.
+   */
   handlersBit?: number;
-  handlerType?: HandlerType; // dot, bar
 
   /**
    * This is bind to handler's style attribute.
