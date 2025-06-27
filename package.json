@@ -13,7 +13,7 @@
   "types": "src/components/ZBox/types.d.ts",
   "exports": {
     ".": {
-      "types": "src/components/ZBox/types.d.ts",
+      "types": "./src/components/ZBox/types.d.ts",
       "import": "./dist/zbox.es.js",
       "require": "./dist/zbox.umd.js"
     },
