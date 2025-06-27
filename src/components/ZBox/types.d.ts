@@ -44,5 +44,3 @@ export type ZBoxEvents = {
 };
 
 declare const ZBox: Component<ZBoxProps, {}, ZBoxEvents>;
-
-export default ZBox;
