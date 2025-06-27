@@ -15,8 +15,23 @@ const props = withDefaults(defineProps<ZBoxProps>(), {
   draggable: false,
   resizable: false,
   handlersBit: 0b1111,
-  handlerStyle: "dot",
+  handlerType: "dot",
 });
+
+// tackle some defaults
+const computedProps = computed(() => ({
+  handlerSize: props.handlerSize || (props.handlerType == "dot" ? 8 : 4),
+  minWidth:
+    props.minWidth || props.handlerSize || (props.handlerType == "dot" ? 8 : 4),
+  minHeight:
+    props.minHeight ||
+    props.handlerSize ||
+    (props.handlerType == "dot" ? 8 : 4),
+}));
+
+const computedHandlerSize = computed(
+  () => computedProps.value.handlerSize + "px"
+);
 
 const $emit = defineEmits<ZBoxEvents>();
 
@@ -113,21 +128,22 @@ function onMouseMove(e: MouseEvent) {
     const dy = e.clientY - startY;
     switch (currentDirection.value) {
       case "top":
-        // prevent height from being negative
-        if (startHeight - dy <= 0) break;
+        if (startHeight - dy <= computedProps.value.minHeight) break;
         zbox.style.height = startHeight - dy + "px";
         if (props.draggable) zbox.style.top = zbox.offsetTop + deltaTop + "px";
         break;
       case "left":
-        if (startWidth - dx <= 0) break;
+        if (startWidth - dx <= computedProps.value.minWidth) break;
         zbox.style.width = startWidth - dx + "px";
         if (props.draggable)
           zbox.style.left = zbox.offsetLeft + deltaLeft + "px";
         break;
       case "right":
+        if (startWidth + dx <= computedProps.value.minWidth) break;
         zbox.style.width = startWidth + dx + "px";
         break;
       case "bottom":
+        if (startHeight + dy <= computedProps.value.minHeight) break;
         zbox.style.height = startHeight + dy + "px";
         break;
       default:
@@ -180,7 +196,8 @@ onBeforeUnmount(() => {
         v-for="handler of handlers"
         :key="handler.dir"
         class="handler"
-        :class="`${Handler.prefix}-${handler.dir} ${Handler.prefix}__${props.handlerStyle}`"
+        :class="`${Handler.prefix}-${handler.dir} ${Handler.prefix}__${props.handlerType}`"
+        :style="handlerStyle"
       ></div>
     </div>
     <slot></slot>
@@ -205,8 +222,6 @@ onBeforeUnmount(() => {
     position: relative;
 
     .handler__wrapper {
-      --handler-bar-size: 4px;
-      --handler-dot-size: 8px;
       position: absolute;
       pointer-events: none;
       width: 100%;
@@ -225,14 +240,14 @@ onBeforeUnmount(() => {
         top: 0;
         left: 0;
         width: 100%;
-        height: var(--handler-bar-size);
+        height: v-bind("computedHandlerSize");
         cursor: ns-resize;
       }
 
       .handler__bar.handler-right {
         top: 0;
         right: 0;
-        width: var(--handler-bar-size);
+        width: v-bind("computedHandlerSize");
         height: 100%;
         cursor: ew-resize;
       }
@@ -241,21 +256,21 @@ onBeforeUnmount(() => {
         bottom: 0;
         left: 0;
         width: 100%;
-        height: var(--handler-bar-size);
+        height: v-bind("computedHandlerSize");
         cursor: ns-resize;
       }
 
       .handler__bar.handler-left {
         top: 0;
         left: 0;
-        width: var(--handler-bar-size);
+        width: v-bind("computedHandlerSize");
         height: 100%;
         cursor: ew-resize;
       }
 
       .handler__dot {
-        width: var(--handler-dot-size);
-        height: var(--handler-dot-size);
+        width: v-bind("computedHandlerSize");
+        height: v-bind("computedHandlerSize");
         background-color: #892;
       }
 
