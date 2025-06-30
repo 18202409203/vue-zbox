@@ -28,7 +28,7 @@ function onResizeEnd(e: MouseEvent) {
 </script>
 
 <template>
-  <div style="position: absolute; left: 200px">
+  <div class="app-box">
     <h1>ZBox</h1>
     <input type="checkbox" v-model="resizable" />
     <label>resizable</label>
@@ -61,6 +61,15 @@ function onResizeEnd(e: MouseEvent) {
 </template>
 
 <style scoped>
+.app-box {
+  position: relative;
+  top: 100px;
+  left: 200px;
+  border: 1px solid #ccc;
+  height: 600px;
+  width: 400px;
+}
+
 .box {
   border: 1px solid #ccc;
   overflow-x: hidden;

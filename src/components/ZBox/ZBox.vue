@@ -18,6 +18,7 @@ import type {
 } from "./types";
 import { useScroll } from "./useScroll";
 import { decomposeDirection } from "./direction";
+import { getContainingBlock } from "./containingBlock";
 
 const props = withDefaults(defineProps<ZBoxProps>(), {
   draggable: false,
@@ -115,50 +116,79 @@ function onMouseUp(e: MouseEvent) {
 }
 
 function onMouseMove(e: MouseEvent) {
-  const zbox = container.value!;
   const deltaLeft = e.clientX - positionX;
   const deltaTop = e.clientY - positionY;
   positionX = e.clientX;
   positionY = e.clientY;
 
   if (currentMode.value === "dragging") {
-    zbox.style.left = zbox.offsetLeft + deltaLeft + "px";
-    zbox.style.top = zbox.offsetTop + deltaTop + "px";
+    updatePosition(deltaLeft, deltaTop);
   } else if (currentMode.value === "resizing") {
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-
-    const dirs: BasicDirection[] = decomposeDirection(currentDirection.value);
-    dirs.forEach(doMove);
-
-    function doMove(dir: BasicDirection) {
-      switch (dir) {
-        case "top":
-          if (startHeight - dy <= computedProps.value.minHeight) break;
-          zbox.style.height = startHeight - dy + "px";
-          if (props.draggable)
-            zbox.style.top = zbox.offsetTop + deltaTop + "px";
-          break;
-        case "left":
-          if (startWidth - dx <= computedProps.value.minWidth) break;
-          zbox.style.width = startWidth - dx + "px";
-          if (props.draggable)
-            zbox.style.left = zbox.offsetLeft + deltaLeft + "px";
-          break;
-        case "right":
-          if (startWidth + dx <= computedProps.value.minWidth) break;
-          zbox.style.width = startWidth + dx + "px";
-          break;
-        case "bottom":
-          if (startHeight + dy <= computedProps.value.minHeight) break;
-          zbox.style.height = startHeight + dy + "px";
-          break;
-        default:
-          console.log("Not support direction: " + dir);
-          break;
-      }
-    }
+    updateSize(dx, dy, deltaLeft, deltaTop);
   }
+}
+
+function updatePosition(deltaLeft = 0, deltaTop = 0) {
+  const zbox = container.value!;
+  const posLeft = zbox.offsetLeft + deltaLeft;
+  const posTop = zbox.offsetTop + deltaTop;
+  if (!props.limited) {
+    const block = getContainingBlock(zbox);
+    if (posTop < 0) {
+      zbox.style.top = 0 + "px";
+      console.log("top exceed");
+    } else if (posTop + zbox.offsetHeight > block.offsetHeight) {
+      zbox.style.top = block.offsetHeight - zbox.offsetHeight + "px";
+      console.log("bottom exceed");
+    } else {
+      zbox.style.top = posTop + "px";
+    }
+    if (posLeft < 0) {
+      zbox.style.left = 0 + "px";
+      console.log("left exceed");
+    } else if (posLeft + zbox.offsetWidth > block.offsetWidth) {
+      zbox.style.left = block.offsetWidth - zbox.offsetWidth + "px";
+      console.log("right exceed");
+    } else {
+      zbox.style.left = posLeft + "px";
+    }
+  } else {
+    zbox.style.left = posLeft + "px";
+    zbox.style.top = posTop + "px";
+  }
+}
+
+function updateSize(dx = 0, dy = 0, deltaLeft = 0, deltaTop = 0) {
+  const zbox = container.value!;
+
+  const dirs: BasicDirection[] = decomposeDirection(currentDirection.value);
+  dirs.forEach(function doMove(dir: BasicDirection) {
+    switch (dir) {
+      case "top":
+        if (startHeight - dy <= computedProps.value.minHeight) break;
+        zbox.style.height = startHeight - dy + "px";
+        if (props.draggable) updatePosition(deltaLeft, deltaTop);
+        break;
+      case "left":
+        if (startWidth - dx <= computedProps.value.minWidth) break;
+        zbox.style.width = startWidth - dx + "px";
+        if (props.draggable) updatePosition(deltaLeft, deltaTop);
+        break;
+      case "right":
+        if (startWidth + dx <= computedProps.value.minWidth) break;
+        zbox.style.width = startWidth + dx + "px";
+        break;
+      case "bottom":
+        if (startHeight + dy <= computedProps.value.minHeight) break;
+        zbox.style.height = startHeight + dy + "px";
+        break;
+      default:
+        console.log("Not support direction: " + dir);
+        break;
+    }
+  });
 }
 
 // generate handler's mousedown event

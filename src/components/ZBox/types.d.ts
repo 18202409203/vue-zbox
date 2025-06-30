@@ -30,6 +30,11 @@ export type ZBoxProps = {
   draggable?: boolean;
 
   /**
+   * Whether zbox can be limited within the [containing block](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Containing_block#identifying_the_containing_block) while dragging.
+   */
+  limited?: boolean;
+
+  /**
    * Min width of zbox. Generally, it should be greater than `handlerSize` at least.
    */
   minWidth?: number;
