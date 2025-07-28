@@ -142,9 +142,28 @@ function updatePosition(deltaLeft = 0, deltaTop = 0) {
   const zbox = container.value!;
   const posLeft = zbox.offsetLeft + deltaLeft;
   const posTop = zbox.offsetTop + deltaTop;
-  if (!props.limited) {
-    const block = getContainingBlock(zbox);
-    if (posTop < 0) {
+  const block = getContainingBlock(zbox);
+
+  if (props.limited) {
+    if (zbox.offsetHeight > block.offsetHeight) {
+      console.log("content's height is higher than container's height");
+      const diffHeight = zbox.offsetHeight - block.offsetHeight;
+      if (deltaTop < 0) {
+        if (posTop <= 0 - diffHeight) {
+          console.log("top exceed, bottom will leave the edge");
+          zbox.style.top = 0 - diffHeight + "px";
+        } else {
+          zbox.style.top = posTop + "px";
+        }
+      } else {
+        if (posTop > 0) {
+          console.log("bottom exceed, top will leave the edge");
+          zbox.style.top = 0 + "px";
+        } else {
+          zbox.style.top = posTop + "px";
+        }
+      }
+    } else if (posTop < 0) {
       zbox.style.top = 0 + "px";
       console.log("top exceed");
     } else if (posTop + zbox.offsetHeight > block.offsetHeight) {
@@ -153,7 +172,26 @@ function updatePosition(deltaLeft = 0, deltaTop = 0) {
     } else {
       zbox.style.top = posTop + "px";
     }
-    if (posLeft < 0) {
+
+    if (zbox.offsetWidth > block.offsetWidth) {
+      console.log("content's width is greater than container's width");
+      const diffWidth = zbox.offsetWidth - block.offsetWidth;
+      if (deltaLeft < 0) {
+        if (posLeft <= 0 - diffWidth) {
+          console.log("left exceed, right will leave the edge");
+          zbox.style.left = 0 - diffWidth + "px";
+        } else {
+          zbox.style.left = posLeft + "px";
+        }
+      } else {
+        if (posLeft > 0) {
+          console.log("right exceed, left will leave the edge");
+          zbox.style.left = 0 + "px";
+        } else {
+          zbox.style.left = posLeft + "px";
+        }
+      }
+    } else if (posLeft < 0) {
       zbox.style.left = 0 + "px";
       console.log("left exceed");
     } else if (posLeft + zbox.offsetWidth > block.offsetWidth) {

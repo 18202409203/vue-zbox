@@ -5,6 +5,7 @@ import HelloWorld from "./components/HelloWorld.vue";
 
 const resizable = ref(true);
 const draggable = ref(true);
+const limited = ref(true);
 
 function onDrag(e: MouseEvent) {
   console.log("drag");
@@ -34,9 +35,12 @@ function onResizeEnd(e: MouseEvent) {
     <label>resizable</label>
     <input type="checkbox" v-model="draggable" />
     <label>draggable</label>
+    <input type="checkbox" v-model="limited" />
+    <label>limited</label>
     <p>Hello!</p>
     <ZBox
       class="box"
+      :limited="limited"
       :draggable="draggable"
       :resizable="resizable"
       :handlers-bit="0b11111111"
@@ -74,7 +78,7 @@ function onResizeEnd(e: MouseEvent) {
   border: 1px solid #ccc;
   overflow-x: hidden;
   overflow-y: auto;
-  width: 200px;
+  width: 600px;
   height: 200px;
   background-color: aqua;
 }

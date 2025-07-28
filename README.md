@@ -81,3 +81,12 @@ export type ZBoxEvents = {
 # Further
 
 Our position strategy is based on `top/left`.
+
+## How `limited` works?
+
+`limited` is a boolean prop. If it is `true`, the zbox will be limited within the containing block while dragging.
+
+There are two cases:
+
+1. The content's width/height is **little** than container's width/height.
+2. The content's width/height is **greater** than container's width/height.
