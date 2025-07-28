@@ -37,8 +37,8 @@ export const HANDLERS: Direction[] = [
 
 export class HandlerGroup {
   handlers: Handler[] = [];
-  flag: number = 0b1111;
-  constructor(flag = 0b1111) {
+  flag: number = 0;
+  constructor(flag = 0) {
     this.flag = flag;
     this.handlers = this._parseHandlers();
   }
@@ -51,7 +51,7 @@ export class HandlerGroup {
     this.handlers.forEach((handler) => handler.uninit());
   }
   _parseHandlers() {
-    const n = this.flag || 0b1111;
+    const n = this.flag;
     return HANDLERS.reduce<Handler[]>((acc, dir, i) => {
       if ((n >> i) & 1) {
         acc.push(new Handler(dir));

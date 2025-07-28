@@ -25,6 +25,7 @@ The prop `handlersBit` you should notice:
 
 | HEX  | BIN          | DEC | DIRECTION   |
 | ---- | ------------ | --- | ----------- |
+| 0x00 | 0b_0000_0000 | 0   | none        |
 | 0x08 | 0b_0000_1000 | 8   | top         |
 | 0x04 | 0b_0000_0100 | 4   | right       |
 | 0x02 | 0b_0000_0010 | 2   | bottom      |
@@ -40,7 +41,7 @@ You can compose those directions freely.
 export type ZBoxProps = {
   /**
    * NOTE: use binary to represent handlers, 1 means enable, 0 means disable
-   * Default is 0b1111.
+   * Default is 0b1111 if `resizable` is true.
    */
   handlersBit?: number;
 

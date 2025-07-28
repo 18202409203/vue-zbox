@@ -16,7 +16,7 @@ export type ZMode = "resizing" | "dragging";
 export type ZBoxProps = {
   /**
    * NOTE: use binary to represent handlers, 1 means enable, 0 means disable
-   * Default is 0b1111.
+   * Default is 0b1111 if `resizable` is true.
    */
   handlersBit?: number;
 

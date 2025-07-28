@@ -37,7 +37,13 @@ const computedHandlerSize = computed(() => props.handlerSize + "px");
 
 const $emit = defineEmits<ZBoxEvents>();
 
-const handlerGroup = new HandlerGroup(props.handlersBit);
+const _handlerBit = computed(() => {
+  if (props.handlersBit) return props.handlersBit;
+  if (props.resizable) return 0b1111;
+  return 0;
+});
+
+const handlerGroup = new HandlerGroup(_handlerBit.value);
 const handlers = handlerGroup.handlers;
 
 const container = ref<HTMLDivElement | null>(null);
