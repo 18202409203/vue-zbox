@@ -88,5 +88,5 @@ Our position strategy is based on `top/left`.
 
 There are two cases:
 
-1. The content's width/height is **little** than container's width/height.
+1. The content's width/height is **less** than container's width/height.
 2. The content's width/height is **greater** than container's width/height.
