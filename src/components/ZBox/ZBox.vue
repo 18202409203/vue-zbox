@@ -59,8 +59,10 @@ watchEffect(() => {
       : "static";
 
     // reset top/left when resizable or draggable changed
-    zbox.style.top = "";
-    zbox.style.left = "";
+    if (zbox.style.position !== "absolute") {
+      zbox.style.top = "";
+      zbox.style.left = "";
+    }
   }
 });
 
